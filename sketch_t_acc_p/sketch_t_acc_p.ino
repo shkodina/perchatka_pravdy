@@ -90,7 +90,7 @@ void toSerial(int16_t ax, int16_t ay, int16_t az, int16_t gx, int16_t gy, int16_
               uint16_t puls, uint16_t tenzo, uint16_t galvanic,
               uint32_t ir, uint32_t red)
 {
-  /*
+  
   Serial.print(ax); Serial.print(",");
   Serial.print(ay); Serial.print(",");
   Serial.print(az); Serial.print(",");
@@ -106,7 +106,7 @@ void toSerial(int16_t ax, int16_t ay, int16_t az, int16_t gx, int16_t gy, int16_
   Serial.print(galvanic); Serial.print(",");
   Serial.print(ir); Serial.print(",");
   Serial.print(red); 
-  */
+  /*
   switch (toshow) {
     case 'x' : Serial.print(ax); break;
     case 'y' : Serial.print(ay); break;
@@ -122,6 +122,7 @@ void toSerial(int16_t ax, int16_t ay, int16_t az, int16_t gx, int16_t gy, int16_
     case 'r' : Serial.print(red); break;
     default: Serial.print(puls); break;
   }
+  */
   Serial.println();
 }
               
