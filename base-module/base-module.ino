@@ -1,5 +1,3 @@
-// #include "I2Cdev.h"                  // Подключение библиотеки I2Cdev
-// #include "MPU6050.h"                 // Подключение библиотеки MPU6050 
 #include "Wire.h"                    // Подключение библиотеки WireCdev
 #include <MAX3010x.h>
 
