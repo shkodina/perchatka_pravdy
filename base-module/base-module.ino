@@ -1,6 +1,8 @@
 #include "Wire.h"                    // Подключение библиотеки WireCdev
 #include <MAX3010x.h>
 
+#include <Adafruit_MLX90614.h>
+Adafruit_MLX90614 termo_face = Adafruit_MLX90614();
 
 MAX30102 pulsometer;
 long pulsometer_red, pulsometer_ir;
@@ -17,9 +19,13 @@ void setup() {
   Serial.begin(115200);                 // Инициализация последовательного порта
 
   pulsometer_begin();
+  delay(100);
   adc_1_galvanic_begin();
   adc_2_galvanic_begin();
   giroskop_axelerometer_begin();
+  delay(100);
+  termo_face.begin(); 
+
 }
 
 void loop() {
@@ -46,6 +52,12 @@ void loop() {
   Serial.print(gx); Serial.print(" ");
   Serial.print(gy); Serial.print(" ");
   Serial.print(gz); Serial.print(" ");
+
+  Serial.print(termo_face.readAmbientTempC()); Serial.print(" ");
+  Serial.print(termo_face.readObjectTempC() ); Serial.print(" ");
+  Serial.print(termo_face.readAmbientTempF()); Serial.print(" ");
+  Serial.print(termo_face.readObjectTempF() ); Serial.print(" ");
+
   
   Serial.println("");
   // delay(100);
