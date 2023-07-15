@@ -1,10 +1,14 @@
-#include "Wire.h"                    // Подключение библиотеки WireCdev
+#include <Wire.h>     
+
 #include <MAX3010x.h>
+MAX30102 pulsometer;
+
+#include <SoftwareSerial.h>
+SoftwareSerial SSerial (10, 9);
 
 #include <Adafruit_MLX90614.h>
 Adafruit_MLX90614 termo_face = Adafruit_MLX90614();
 
-MAX30102 pulsometer;
 long pulsometer_red, pulsometer_ir;
 
 int16_t ax, ay, az, agt, gx, gy, gz;                  // Переменные для хранения значений акселерометра гироскопа
@@ -14,9 +18,12 @@ int16_t tenzo_line;
 int32_t adc_1_galvanic_value, adc_2_galvanic_value;
 float   adc_1_galvanic_volt,  adc_2_galvanic_volt;
 
+String buff; // буфер для чтения с мышки
+
 void setup() {
   Wire.begin();                         // Инициализация Wire
   Serial.begin(115200);                 // Инициализация последовательного порта
+  SSerial.begin(19200);
 
   pulsometer_begin();
   delay(100);
@@ -36,10 +43,10 @@ void loop() {
   tenzo_line_read();
 
   Serial.print(adc_1_galvanic_value); Serial.print(" ");
-  Serial.print(adc_1_galvanic_volt); Serial.print(" ");
+  // Serial.print(adc_1_galvanic_volt); Serial.print(" ");
 
   Serial.print(adc_2_galvanic_value); Serial.print(" ");
-  Serial.print(adc_2_galvanic_volt); Serial.print(" ");
+  // Serial.print(adc_2_galvanic_volt); Serial.print(" ");
 
   Serial.print(tenzo_line); Serial.print(" ");
 
@@ -55,17 +62,29 @@ void loop() {
 
   Serial.print(termo_face.readAmbientTempC()); Serial.print(" ");
   Serial.print(termo_face.readObjectTempC() ); Serial.print(" ");
-  Serial.print(termo_face.readAmbientTempF()); Serial.print(" ");
-  Serial.print(termo_face.readObjectTempF() ); Serial.print(" ");
+  // Serial.print(termo_face.readAmbientTempF()); Serial.print(" ");
+  // Serial.print(termo_face.readObjectTempF() ); Serial.print(" ");
+
+  buff = "";
+  while (SSerial.available() > 0) {
+        buff += char(SSerial.read());
+  }
+  int8_t msg_s = buff.indexOf("*");
+  int8_t msg_f = buff.indexOf("#", msg_s);
+  if (msg_s >= 0 && msg_f > 0) 
+  {
+      Serial.print(buff.substring(msg_s + 1, msg_f));
+  }
+
 
   
-  Serial.println("");
-  // delay(100);
+  Serial.println(""); 
+  delay(50);
 }
 
 // ########################################################
 // https://alexgyver.ru/arduino-mpu6050/
-#define MPU_addr 0x68 // адрес датчика
+#define MPU_addr 0x69 // адрес датчика
 
 void giroskop_axelerometer_begin ()
 {
@@ -79,7 +98,7 @@ void giroskop_axelerometer_read () {
   // массив данных
   // [accX, accY, accZ, temp, gyrX, gyrY, gyrZ]
   // acc - ускорение, gyr - угловая скорость, temp - температура (raw)
-  int16_t data[7]; 
+  uint16_t data[7]; 
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -137,7 +156,7 @@ void adc_1_galvanic_read () {
   adc_1_galvanic_value = 0;
   adc_1_galvanic_value = Wire.read();//упаковка в одну переменную.
   adc_1_galvanic_value= ((adc_1_galvanic_value<<8)| Wire.read()); //упаковка в одну переменную.
-  adc_1_galvanic_value= ((adc_1_galvanic_value<<8)| Wire.read()); //упаковка в одну переменную.
+  Wire.read(); // adc_1_galvanic_value= ((adc_1_galvanic_value<<8)| Wire.read()); //упаковка в одну переменную.
   adc_1_galvanic_volt = adc_1_galvanic_value * 2.048 /131072 ; // LSB=15uV
 }
 
